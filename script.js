@@ -53,7 +53,7 @@ function startGame() {
 
   backgroundMusic.play();
   HighScore = localStorage.getItem("flappyHighScore") || 0;
-  score_display.textContent = "score: " + score +" | Best " + HighScore;
+  score_display.textContent = "score: " + score + " | Best " + HighScore;
 
   gameInterval = setInterval(() => {
     // session 2
@@ -63,7 +63,7 @@ function startGame() {
     // session 3
     frame++;
 
-    checkcollision()
+    checkcollision();
 
     // session 3
     // Every 200 frames (~2 seconds), create new pipe
@@ -116,7 +116,6 @@ function movePipes() {
   pipes = pipes.filter((pipe) => pipe.offsetLeft + pipe.offsetWidth > 0);
 }
 
-
 // session 2
 // Start button (optional extra)
 start_btn.addEventListener("click", () => {
@@ -127,39 +126,47 @@ start_btn.addEventListener("click", () => {
 });
 
 function checkcollision() {
-    let birdRect = bird.getBoundingClientRect();
-    for (let pipe of pipes ) {
-        let pipeRect = pipe.getBoundingClientRect();
+  let birdRect = bird.getBoundingClientRect();
 
-        if (
-            birdRect.left < pipeRect.left + pipeRect.width &&
-            birdRect.left + birdRect.width > pipeRect.left &&
-            birdRect.top < pipeRect.top + pipeRect.height &&
-            birdRect.top + birdRect.height > pipeRect.top
-        ) {
-            endGame();
-            return;
-        }
+  let birdPos = {
+    left: birdRect.left - 5,
+    width: birdRect.width - 5,
+    height: birdRect.height - 5,
+    top: birdRect.top - 5,
+  };
+
+  for (let pipe of pipes) {
+    let pipeRect = pipe.getBoundingClientRect();
+
+    if (
+      birdPos.left < pipeRect.left + pipeRect.width &&
+      birdPos.left + birdPos.width > pipeRect.left &&
+      birdPos.top < pipeRect.top + pipeRect.height &&
+      birdPos.top + birdPos.height > pipeRect.top
+    ) {
+      endGame();
+      return;
     }
+  }
 
-if (
+  if (
     bird.offsetTop <= 0 ||
     bird.offsetTop >= game_container.offsetHeight - bird.offsetHeight
-) {
+  ) {
     endGame();
-}
+  }
 
-pipes.forEach((pipe, index) => {
+  pipes.forEach((pipe, index) => {
     if (index % 2 === 0) {
-        if (
-            pipe.offsetLeft + pipe.offsetWidth < bird.offsetLeft &&
-            !pipe.passed
-            ) {
-            pipe.passed = true;
-            setScore(score + 1);
-            }
-        }
-    })
+      if (
+        pipe.offsetLeft + pipe.offsetWidth < bird.offsetLeft &&
+        !pipe.passed
+      ) {
+        pipe.passed = true;
+        setScore(score + 1);
+      }
+    }
+  });
 }
 
 function setScore(newScore) {
@@ -171,25 +178,25 @@ function setScore(newScore) {
 }
 
 function endGame() {
-    clearInterval (gameInterval);
-    gameInterval = null;
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
-    alert("Game Over Get Better Noob, Your score: " + score);
-    resetGame();
+  clearInterval(gameInterval);
+  gameInterval = null;
+  backgroundMusic.pause();
+  backgroundMusic.currentTime = 0;
+  alert("Game Over Get Better Noob, Your score: " + score);
+  resetGame();
 }
 
-function resetGame () {
-    bird.style.top = "50%";
-    bird_dy = 0;
-    for (let pipe of pipes) {
-        pipe.remove();
-    }
-    pipes = [];
-    setScore(0);
-    frame = 0;
-    game_state = "Start";
-    score_display.textContent = "";
+function resetGame() {
+  bird.style.top = "50%";
+  bird_dy = 0;
+  for (let pipe of pipes) {
+    pipe.remove();
+  }
+  pipes = [];
+  setScore(0);
+  frame = 0;
+  game_state = "Start";
+  score_display.textContent = "";
 }
 
 let pipeSpeed = 3;
@@ -208,7 +215,7 @@ function getDifficultySettings() {
 
 function applyGravity() {
   bird_dy += gravity;
-  let birdTop = bird.offsetTop + bird_dy
+  let birdTop = bird.offsetTop + bird_dy;
 
   birdTop = Math.max(birdTop, 0);
   birdTop = Math.min(birdTop, game_container.offsetHeight - bird.offsetHeight);
@@ -220,7 +227,7 @@ function applyGravity() {
 }
 
 const flapSound = new Audio("sounds/bonus.mp3");
-const scoreSound = new Audio("sounds/bonus.mp3");   
+const scoreSound = new Audio("sounds/bonus.mp3");
 const hitSound = new Audio("sounds/bonus.mp3");
 
 const backgroundMusic = new Audio("sounds/bonus.mp3");
@@ -239,4 +246,3 @@ backgroundMusic.volume = 0.5;
 //     bird_dy = -7;
 //   }
 // });
-
