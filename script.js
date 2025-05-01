@@ -29,6 +29,9 @@ document.addEventListener("keydown", (e) => {
       game_state = "Play";
       startGame();
     }
+
+    flapSound.play();
+
     bird_dy = -7;
   }
 });
@@ -48,6 +51,10 @@ function applyGravity() {
 function startGame() {
   if (gameInterval !== null) return; // Prevent multiple intervals
 
+  backgroundMusic.play();
+  HighScore = localStorage.getItem("flappyHighScore") || 0;
+  score_display.textContent = "score: " + score +" | Best " + HighScore;
+
   gameInterval = setInterval(() => {
     // session 2
     applyGravity();
@@ -55,6 +62,8 @@ function startGame() {
     movePipes();
     // session 3
     frame++;
+
+    checkcollision()
 
     // session 3
     // Every 200 frames (~2 seconds), create new pipe
@@ -154,15 +163,18 @@ pipes.forEach((pipe, index) => {
 }
 
 function setScore(newScore) {
-    score = newScore;
-    score_display.textContent = "score: " + score;
+  if (newScore > score) {
+    scoreSound.play();
+  }
+  score = newScore;
+  score_display.textContent = "score: " + score;
 }
 
 function endGame() {
     clearInterval (gameInterval);
     gameInterval = null;
-
-
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
     alert("Game Over Get Better Noob, Your score: " + score);
     resetGame();
 }
@@ -179,3 +191,52 @@ function resetGame () {
     game_state = "Start";
     score_display.textContent = "";
 }
+
+let pipeSpeed = 3;
+
+function getDifficultySettings() {
+  const selected = document.getElementById("difficulty-select").value;
+
+  if (selected === "easy") {
+    pipeSpeed = 2;
+  } else if (selected === "medium") {
+    pipeSpeed = 3;
+  } else if (selected === "hard") {
+    pipeSpeed = 5;
+  }
+}
+
+function applyGravity() {
+  bird_dy += gravity;
+  let birdTop = bird.offsetTop + bird_dy
+
+  birdTop = Math.max(birdTop, 0);
+  birdTop = Math.min(birdTop, game_container.offsetHeight - bird.offsetHeight);
+
+  bird.style.top = birdTop + "px";
+
+  let angle = Math.min(Math.max(bird_dy * 2, -30), 90);
+  bird.style.transform = `rotate(${angle}deg)`;
+}
+
+const flapSound = new Audio("sounds/bonus.mp3");
+const scoreSound = new Audio("sounds/bonus.mp3");   
+const hitSound = new Audio("sounds/bonus.mp3");
+
+const backgroundMusic = new Audio("sounds/bonus.mp3");
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5;
+
+// document.addEventListener("keydown", (e) => {
+//   if (e.code === "space" || e.code === "ArrowUp") {
+//     if (game_state !== "play"); {
+//       game_state = "play";
+//       startGame();
+//     }
+
+//     flapSound.play();
+
+//     bird_dy = -7;
+//   }
+// });
+
