@@ -16,6 +16,8 @@ const frame_time = 150;
 let pipes = [];
 let pipe_gap = 250;
 
+let highScore = localStorage.getItem("flappyHighScore") || 0;
+
 // session 2
 let bird = document.getElementById("bird");
 let score_display = document.getElementById("score");
@@ -52,8 +54,7 @@ function startGame() {
   if (gameInterval !== null) return; // Prevent multiple intervals
 
   backgroundMusic.play();
-  HighScore = localStorage.getItem("flappyHighScore") || 0;
-  score_display.textContent = "score: " + score + " | Best " + HighScore;
+
 
   gameInterval = setInterval(() => {
     // session 2
@@ -64,6 +65,11 @@ function startGame() {
     frame++;
 
     checkcollision();
+
+    getDifficultySettings();
+
+    highScore = localStorage.getItem("flappyHighScore") || 0;
+    score_display.textContent = "score: " + score + " | Best " + highScore;
 
     // session 3
     // Every 200 frames (~2 seconds), create new pipe
@@ -103,12 +109,13 @@ function createPipe() {
 // session 3
 // Move pipes
 function movePipes() {
+  console.log(pipeSpeed);
   for (let pipe of pipes) {
-    pipe.style.left = pipe.offsetLeft - 3 + "px";
+    pipe.style.left = pipe.offsetLeft - pipeSpeed + "px";
 
     // Remove pipes off screen
     if (pipe.offsetLeft < -pipe.offsetWidth) {
-      pipe.remove();
+      pipe.remove(); 
     }
   }
 
@@ -174,15 +181,19 @@ function setScore(newScore) {
     scoreSound.play();
   }
   score = newScore;
-  score_display.textContent = "score: " + score;
 }
 
 function endGame() {
+if(Number(score) > Number(highScore)){
+  localStorage.setItem("flappyHighScore",score)
+}
+
   clearInterval(gameInterval);
   gameInterval = null;
   backgroundMusic.pause();
   backgroundMusic.currentTime = 0;
   alert("Game Over Get Better Noob, Your score: " + score);
+
   resetGame();
 }
 
@@ -203,13 +214,12 @@ let pipeSpeed = 3;
 
 function getDifficultySettings() {
   const selected = document.getElementById("difficulty-select").value;
-
   if (selected === "easy") {
     pipeSpeed = 2;
   } else if (selected === "medium") {
     pipeSpeed = 3;
   } else if (selected === "hard") {
-    pipeSpeed = 5;
+    pipeSpeed = 10;
   }
 }
 
@@ -234,15 +244,13 @@ const backgroundMusic = new Audio("sounds/bonus.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.5;
 
-// document.addEventListener("keydown", (e) => {
-//   if (e.code === "space" || e.code === "ArrowUp") {
-//     if (game_state !== "play"); {
-//       game_state = "play";
-//       startGame();
-//     }
+function updateBirdAvatar(score) {
+  if (score >= 10 && score < 20) {
+    bird.style.background = "url(/assets/bird_level2.png) center center"
+  } else if (score >= 20) {
+        bird.style.background = "url(/assets/bird_level3.png) center center";
+  } else {
+        bird.style.background = "url(/assets/bird.png) center center";
 
-//     flapSound.play();
-
-//     bird_dy = -7;
-//   }
-// });
+  }
+}
